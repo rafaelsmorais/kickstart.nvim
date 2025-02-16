@@ -1,0 +1,11 @@
+{
+  "name": "cypress-snippets",
+  "contributes": {
+    "snippets": [
+      {
+        "language": [ "javascriptreact", "javascript", "typescript", "typescriptreact" ],
+        "path": "./snippets/cypress.json"
+      }
+    ]
+  },
+}

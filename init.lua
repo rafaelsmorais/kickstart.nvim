@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -321,6 +321,7 @@ require('lazy').setup({
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>ww', desc = 'Open Vimwiki', mode = { 'n' } },
       },
     },
   },
@@ -738,12 +739,12 @@ require('lazy').setup({
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
@@ -850,6 +851,12 @@ require('lazy').setup({
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
     end,
+    config = function()
+      require('tokyonight').setup {
+        style = 'night',
+        transparent = true,
+      }
+    end,
   },
 
   -- Highlight todo, notes, etc in comments
@@ -878,7 +885,8 @@ require('lazy').setup({
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
       -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
+      -- statusline.setup { use_icons = vim.g.have_nerd_font }
+      statusline.setup { use_icons = true }
 
       -- You can configure sections in the statusline by overriding their
       -- default behavior. For example, here we set the section for
@@ -890,6 +898,12 @@ require('lazy').setup({
 
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
+      require('mini.pairs').setup()
+      require('mini.tabline').setup()
+      -- require('mini.files').setup()
+      require('mini.icons').setup()
+      require('mini.indentscope').setup()
+      -- require('mini.diff').setup()
     end,
   },
   { -- Highlight, edit, and navigate code
@@ -898,7 +912,7 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'javascript', 'css', 'json' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -917,6 +931,40 @@ require('lazy').setup({
     --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
+  {
+    -- The plugin location on GitHub
+    'vimwiki/vimwiki',
+    -- The event that triggers the plugin
+    -- event = 'BufEnter *.md',
+    -- The keys that trigger the plugin
+    keys = { '<leader>ww', '<leader>wt' },
+    -- The configuration for the plugin
+    init = function()
+      vim.g.vimwiki_list = {
+        {
+          -- Here will be the path for your wiki
+          path = '~/Notas/',
+          -- The syntax for the wiki
+          syntax = 'markdown',
+          ext = '.md',
+        },
+      }
+      vim.g.vimwiki_global_ext = 0
+      -- vim.g.vimwiki_ext2syntax = {}
+    end,
+  },
+  -- lazy.nvim
+  {
+    'folke/snacks.nvim',
+    ---@type snacks.Config
+    opts = {
+      terminal = {
+        -- your terminal configuration comes here
+        -- or leave it empty to use the default settings
+        -- refer to the configuration section below
+      },
+    },
+  },
 
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
@@ -931,7 +979,7 @@ require('lazy').setup({
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
@@ -965,6 +1013,12 @@ require('lazy').setup({
     },
   },
 })
+-- require('luasnip.loaders.from_vscode').load { paths = { './snippets/' } }
+require 'custom.plugins.snippets'
+
+vim.keymap.set('n', '<leader>tt', function()
+  Snacks.terminal.toggle()
+end, { desc = '[T]oggle [T]erminal' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
